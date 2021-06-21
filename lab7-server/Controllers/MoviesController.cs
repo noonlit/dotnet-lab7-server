@@ -38,11 +38,10 @@ namespace Lab7.Controllers
 		/// <response code="200">The filtered movies.</response>
 		[HttpGet]
 		[Route("filter/{startDate}_{endDate}")]
-		public async Task<ActionResult<IEnumerable<MovieViewModel>>> GetFilteredMovies(string startDate, string endDate, int? page = 1, int? perPage = 20)
+		public async Task<ActionResult<PaginatedResultSet<Movie>>> GetFilteredMovies(string startDate, string endDate, int? page = 1, int? perPage = 20)
 		{
-			var moviesResponse = await _movieService.GetFilteredMovies(startDate, endDate, page, perPage);
-			var entities = moviesResponse.ResponseOk.Entities;
-			return _mapper.Map<List<Movie>, List<MovieViewModel>>(entities);
+			var result = await _movieService.GetFilteredMovies(startDate, endDate, page, perPage);
+			return result.ResponseOk;
 		}
 
 		/// <summary>
@@ -54,12 +53,10 @@ namespace Lab7.Controllers
 		/// </remarks>
 		/// <response code="200">The movies.</response>
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<MovieViewModel>>> GetMovies()
+		public async Task<ActionResult<PaginatedResultSet<Movie>>> GetMovies(int? page = 1, int? perPage = 20)
 		{
-			var moviesResponse = await _movieService.GetMovies();
-			var movies = moviesResponse.ResponseOk.Entities;
-
-			return _mapper.Map<List<Movie>, List<MovieViewModel>>(movies);
+			var result = await _movieService.GetMovies(page, perPage);
+			return result.ResponseOk;
 		}
 
 		/// <summary>
@@ -75,7 +72,7 @@ namespace Lab7.Controllers
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
 		[HttpGet("{id}/Comments")]
-		public async Task<ActionResult<MovieWithCommentsViewModel>> GetCommentsForMovieAsync(int id, int? page = 1, int? perPage = 20)
+		public async Task<ActionResult<PaginatedResultSet<Comment>>> GetCommentsForMovieAsync(int id, int? page = 1, int? perPage = 20)
 		{
 			if (!_movieService.MovieExists(id))
 			{
@@ -91,12 +88,7 @@ namespace Lab7.Controllers
 			}
 
 			var commentsResponse = await _movieService.GetCommentsForMovie(id);
-			var comments = commentsResponse.ResponseOk.Entities;
-
-			var result = _mapper.Map<MovieWithCommentsViewModel>(movie);
-			result.Comments = _mapper.Map<List<Comment>, List<CommentViewModel>>(comments);
-
-			return result;
+			return commentsResponse.ResponseOk;
 		}
 
 		/// <summary>

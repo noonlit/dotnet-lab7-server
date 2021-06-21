@@ -34,7 +34,7 @@ namespace Lab7.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<FavouritesForUserViewModel>>> GetAll()
+        public async Task<ActionResult<PaginatedResultSet<Favourites>>> GetAll()
         {
             var user = await _userManager.FindByNameAsync(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
@@ -44,9 +44,7 @@ namespace Lab7.Controllers
             }
 
             var serviceResponse = await _favouritesService.GetFavourites(user.Id);
-            var favourites = serviceResponse.ResponseOk.Entities;
-
-            return _mapper.Map<List<Favourites>, List<FavouritesForUserViewModel>>(favourites);
+            return serviceResponse.ResponseOk;
         }
 
         [HttpPost]
