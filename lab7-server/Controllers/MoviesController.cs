@@ -35,6 +35,8 @@ namespace Lab7.Controllers
 		/// </remarks>
 		/// <param name="startDate"></param>
 		/// <param name="endDate"></param>
+		/// <param name="page">The current page</param>
+		/// <param name="perPage">The number of results per page</param>
 		/// <response code="200">The filtered movies.</response>
 		[HttpGet]
 		[Route("filter/{startDate}_{endDate}")]
@@ -51,6 +53,8 @@ namespace Lab7.Controllers
 		/// Sample request:
 		/// GET /api/Movies
 		/// </remarks>
+		/// <param name="page">The current page</param>
+		/// <param name="perPage">The number of results per page</param>
 		/// <response code="200">The movies.</response>
 		[HttpGet]
 		public async Task<ActionResult<PaginatedResultSet<Movie>>> GetMovies(int? page = 1, int? perPage = 20)
@@ -67,6 +71,8 @@ namespace Lab7.Controllers
 		/// GET api/Movies/5/Comments
 		/// </remarks>
 		/// <param name="id">The movie ID</param>
+		/// <param name="page">The current page</param>
+		/// <param name="perPage">The number of results per page</param>
 		/// <response code="200">The movie.</response>
 		/// <response code="404">If the movie is not found.</response>
 		[ProducesResponseType(StatusCodes.Status200OK)]
