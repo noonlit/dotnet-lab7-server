@@ -8,7 +8,7 @@ namespace Lab7.Services
 {
 	public interface IFavouritesManagementService
 	{
-		Task<ServiceResponse<List<Favourites>, IEnumerable<EntityManagementError>>> GetFavourites(string userId);
+		Task<ServiceResponse<PaginatedResultSet<Favourites>, IEnumerable<EntityManagementError>>> GetFavourites(string userId, int? page = 1, int? perPage = 10);
 		Task<ServiceResponse<Favourites, IEnumerable<EntityManagementError>>> GetFavourite(string userId, int id);
 		Task<ServiceResponse<Favourites, IEnumerable<EntityManagementError>>> GetFavouritesForYear(string userId, int year);
 		Task<ServiceResponse<Favourites, IEnumerable<EntityManagementError>>> CreateFavourites(string userId, NewFavouritesForUserViewModel newFavouritesRequest);

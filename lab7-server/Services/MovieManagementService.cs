@@ -1,6 +1,7 @@
 ﻿using Lab7.Data;
 using Lab7.Errors;
 using Lab7.Models;
+using Lab7.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -17,25 +18,51 @@ namespace Lab7.Services
 			_context = context;
 		}
 
-		public async Task<ServiceResponse<List<Movie>, IEnumerable<EntityManagementError>>> GetMovies()
+		public async Task<ServiceResponse<PaginatedResultSet<Movie>, IEnumerable<EntityManagementError>>> GetMovies(int? page = 1, int? perPage = 10)
 		{
-			var movies = await _context.Movies.ToListAsync();
-			var serviceResponse = new ServiceResponse<List<Movie>, IEnumerable<EntityManagementError>>();
-			serviceResponse.ResponseOk = movies;
+			var movies = await _context.Movies
+				.Skip((page.Value - 1) * perPage.Value)
+				.Take(perPage.Value)
+				.ToListAsync();
+
+			var count = await getMoviesCount();
+
+			var resultSet = new PaginatedResultSet<Movie>(movies, page.Value, count, perPage.Value);
+
+			var serviceResponse = new ServiceResponse<PaginatedResultSet<Movie>, IEnumerable<EntityManagementError>>();
+			serviceResponse.ResponseOk = resultSet;
 			return serviceResponse;
 		}
 
-		public async Task<ServiceResponse<List<Movie>, IEnumerable<EntityManagementError>>> GetFilteredMovies(string startDate, string endDate)
+		public async Task<ServiceResponse<PaginatedResultSet<Movie>, IEnumerable<EntityManagementError>>> GetFilteredMovies(string startDate, string endDate, int? page = 1, int? perPage = 10)
 		{
 			var startDateDt = DateTime.Parse(startDate);
 			var endDateDt = DateTime.Parse(endDate);
 
-			var movies = await _context.Movies.Where(m => m.AddedAt >= startDateDt && m.AddedAt <= endDateDt)
-				.OrderByDescending(m => m.ReleaseYear).ToListAsync();
+			var movies = await _context.Movies
+				.Where(m => m.AddedAt >= startDateDt && m.AddedAt <= endDateDt)
+				.OrderByDescending(m => m.ReleaseYear)
+				.Skip((page.Value - 1) * perPage.Value)
+				.Take(perPage.Value)
+				.ToListAsync();
 
-			var serviceResponse = new ServiceResponse<List<Movie>, IEnumerable<EntityManagementError>>();
-			serviceResponse.ResponseOk = movies;
+			var count = await getMoviesCount();
+
+			var resultSet = new PaginatedResultSet<Movie>(movies, page.Value, count, perPage.Value);
+
+			var serviceResponse = new ServiceResponse<PaginatedResultSet<Movie>, IEnumerable<EntityManagementError>>();
+			serviceResponse.ResponseOk = resultSet;
 			return serviceResponse;
+		}
+
+		public async Task<int> getMoviesCount()
+		{
+			return await _context.Movies.CountAsync();
+		}
+
+		public async Task<int> getCommentsCount(int movieId)
+		{
+			return await _context.Comments.Where(c => c.MovieId == movieId).CountAsync();
 		}
 
 		public async Task<ServiceResponse<Movie, IEnumerable<EntityManagementError>>> GetMovie(int id)
@@ -47,12 +74,20 @@ namespace Lab7.Services
 			return serviceResponse;
 		}
 
-		public async Task<ServiceResponse<List<Comment>, IEnumerable<EntityManagementError>>> GetCommentsForMovie(int id)
+		public async Task<ServiceResponse<PaginatedResultSet<Comment>, IEnumerable<EntityManagementError>>> GetCommentsForMovie(int id, int? page = 1, int? perPage = 10)
 		{
-			var comments = await _context.Comments.Where(c => c.MovieId == id).ToListAsync();
+			var comments = await _context.Comments
+				.Where(c => c.MovieId == id)
+				.Skip((page.Value - 1) * perPage.Value)
+				.Take(perPage.Value)
+				.ToListAsync();
 
-			var serviceResponse = new ServiceResponse<List<Comment>, IEnumerable<EntityManagementError>>();
-			serviceResponse.ResponseOk = comments;
+			var count = await getCommentsCount(id);
+
+			var resultSet = new PaginatedResultSet<Comment>(comments, page.Value, count, perPage.Value);
+
+			var serviceResponse = new ServiceResponse<PaginatedResultSet<Comment>, IEnumerable<EntityManagementError>>();
+			serviceResponse.ResponseOk = resultSet;
 			return serviceResponse;
 		}
 

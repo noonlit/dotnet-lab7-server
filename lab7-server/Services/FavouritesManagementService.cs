@@ -55,11 +55,21 @@ namespace Lab7.Services
 			return serviceResponse;
 		}
 
-		public async Task<ServiceResponse<List<Favourites>, IEnumerable<EntityManagementError>>> GetFavourites(string userId)
+		public async Task<ServiceResponse<PaginatedResultSet<Favourites>, IEnumerable<EntityManagementError>>> GetFavourites(string userId, int? page = 1, int? perPage = 10)
 		{
-			var result = await _context.Favourites.Where(f => f.User.Id == userId).Include(f => f.Movies).OrderByDescending(f => f.Year).ToListAsync();
-			var serviceResponse = new ServiceResponse<List<Favourites>, IEnumerable<EntityManagementError>>();
-			serviceResponse.ResponseOk = result;
+			var favourites = await _context.Favourites
+				.Where(f => f.User.Id == userId)
+				.Include(f => f.Movies)
+				.OrderByDescending(f => f.Year)
+				.ToListAsync();
+
+			var count = await _context.Favourites.Where(f => f.User.Id == userId).CountAsync();
+
+			var resultSet = new PaginatedResultSet<Favourites>(favourites, page.Value, count, perPage.Value);
+
+			var serviceResponse = new ServiceResponse<PaginatedResultSet<Favourites>, IEnumerable<EntityManagementError>>();
+			serviceResponse.ResponseOk = resultSet;
+
 			return serviceResponse;
 		}
 

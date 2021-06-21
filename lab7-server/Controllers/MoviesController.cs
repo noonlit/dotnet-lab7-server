@@ -38,12 +38,11 @@ namespace Lab7.Controllers
 		/// <response code="200">The filtered movies.</response>
 		[HttpGet]
 		[Route("filter/{startDate}_{endDate}")]
-		public async Task<ActionResult<IEnumerable<MovieViewModel>>> GetFilteredMovies(string startDate, string endDate)
+		public async Task<ActionResult<IEnumerable<MovieViewModel>>> GetFilteredMovies(string startDate, string endDate, int? page = 1, int? perPage = 20)
 		{
-			var moviesResponse = await _movieService.GetFilteredMovies(startDate, endDate);
-			var movies = moviesResponse.ResponseOk;
-
-			return _mapper.Map<List<Movie>, List<MovieViewModel>>(movies);
+			var moviesResponse = await _movieService.GetFilteredMovies(startDate, endDate, page, perPage);
+			var entities = moviesResponse.ResponseOk.Entities;
+			return _mapper.Map<List<Movie>, List<MovieViewModel>>(entities);
 		}
 
 		/// <summary>
@@ -58,7 +57,7 @@ namespace Lab7.Controllers
 		public async Task<ActionResult<IEnumerable<MovieViewModel>>> GetMovies()
 		{
 			var moviesResponse = await _movieService.GetMovies();
-			var movies = moviesResponse.ResponseOk;
+			var movies = moviesResponse.ResponseOk.Entities;
 
 			return _mapper.Map<List<Movie>, List<MovieViewModel>>(movies);
 		}
@@ -76,7 +75,7 @@ namespace Lab7.Controllers
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
 		[HttpGet("{id}/Comments")]
-		public async Task<ActionResult<MovieWithCommentsViewModel>> GetCommentsForMovieAsync(int id)
+		public async Task<ActionResult<MovieWithCommentsViewModel>> GetCommentsForMovieAsync(int id, int? page = 1, int? perPage = 20)
 		{
 			if (!_movieService.MovieExists(id))
 			{
@@ -92,7 +91,7 @@ namespace Lab7.Controllers
 			}
 
 			var commentsResponse = await _movieService.GetCommentsForMovie(id);
-			var comments = commentsResponse.ResponseOk;
+			var comments = commentsResponse.ResponseOk.Entities;
 
 			var result = _mapper.Map<MovieWithCommentsViewModel>(movie);
 			result.Comments = _mapper.Map<List<Comment>, List<CommentViewModel>>(comments);

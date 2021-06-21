@@ -44,7 +44,7 @@ namespace Lab7.Controllers
             }
 
             var serviceResponse = await _favouritesService.GetFavourites(user.Id);
-            var favourites = serviceResponse.ResponseOk;
+            var favourites = serviceResponse.ResponseOk.Entities;
 
             return _mapper.Map<List<Favourites>, List<FavouritesForUserViewModel>>(favourites);
         }
