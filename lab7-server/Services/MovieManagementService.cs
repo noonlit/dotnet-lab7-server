@@ -82,7 +82,7 @@ namespace Lab7.Services
 				.Take(perPage.Value)
 				.ToListAsync();
 
-			var count = await getCommentsCount(id);
+			var count = await _context.Comments.Where(c => c.MovieId == id).CountAsync();
 
 			var resultSet = new PaginatedResultSet<Comment>(comments, page.Value, count, perPage.Value);
 

@@ -33,8 +33,10 @@ namespace Lab7.Models
 
 		public bool Watched { get; set; } = false;
 
+		[JsonIgnore]
 	    public List<Comment> Comments { get; set; }
 
+		[JsonIgnore]
 		public List<Favourites> Favourites { get; set; }
 	}
 }

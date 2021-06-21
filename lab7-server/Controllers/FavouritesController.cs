@@ -34,7 +34,7 @@ namespace Lab7.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<PaginatedResultSet<Favourites>>> GetAll()
+        public async Task<ActionResult<PaginatedResultSet<Favourites>>> GetAll(int? page = 1, int? perPage = 20)
         {
             var user = await _userManager.FindByNameAsync(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
@@ -43,7 +43,7 @@ namespace Lab7.Controllers
                 return NotFound();
             }
 
-            var serviceResponse = await _favouritesService.GetFavourites(user.Id);
+            var serviceResponse = await _favouritesService.GetFavourites(user.Id, page, perPage);
             return serviceResponse.ResponseOk;
         }
 
